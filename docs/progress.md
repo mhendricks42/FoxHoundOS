@@ -16,7 +16,12 @@
 - `docker compose config` is valid; all three services resolve with their profiles.
 - `just --summary` parses the justfile.
 
-**Not verified: the M0 acceptance check is still open**
+**Windows results (2026-10-14)**
+- `just lint` from PowerShell: dev image built in ~35 s, "lint: all checks passed".
+- Compose printed a harmless `Get "http://localhost/v2/"` warning because it tried to pull the `localhost/...` image before building it. Fixed with `pull_policy: never` (tested: builds when the image is missing, no pull attempt, quiet afterwards).
+- Still pending: `just dev`, and the `/dev/kvm` check.
+
+**Earlier sandbox notes**
 - The dev image was not built: the sandbox's network policy blocks the Fedora mirrors (`mirrors.fedoraproject.org`, `registry.fedoraproject.org`). So `just lint` / `just dev` haven't run end to end through the container.
 - Nothing has been run from PowerShell on Windows. The `windows-shell` behavior and the stub recipes (`echo ...; exit 1`) still need checking there.
 - To close M0, on a clean Windows box: install Git + Docker Desktop + just, then `just lint` (expect "lint: all checks passed") and `just dev` (expect a bash prompt in `/workspace`).

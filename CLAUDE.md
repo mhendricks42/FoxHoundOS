@@ -91,7 +91,7 @@ Justfile rules (so recipes run identically under PowerShell and sh):
 - Use `-T` for non-interactive recipes so they also work without a TTY (CI).
 
 Compose decisions:
-- `dev`, `builder` and `vm` share one image, `localhost/foxhoundos-dev:local`, built from `.devcontainer/Containerfile` (pinned to `fedora:44`). `builder` and `vm` sit behind the `build` and `vm` profiles.
+- `dev`, `builder` and `vm` share one image, `localhost/foxhoundos-dev:local`, built from `.devcontainer/Containerfile` (pinned to `fedora:44`). `builder` and `vm` sit behind the `build` and `vm` profiles. `pull_policy: never` makes compose build it when missing instead of trying to pull from a registry named `localhost`.
 - `/dev/kvm` is never listed under `devices:`, because compose fails hard when it is missing. The vm script detects it at runtime and falls back to TCG.
 
 ## 5. Milestones

@@ -6,6 +6,9 @@ x-dev-image: &dev-image
     context: .devcontainer
     dockerfile: Containerfile
   image: localhost/foxhoundos-dev:local
+  # Local-only image: build it when missing, never try to pull it (otherwise
+  # compose first queries a registry at "localhost" and prints a warning).
+  pull_policy: never
 
 services:
   # Unprivileged shell for linting, branding generation and editing.
