@@ -1,0 +1,4 @@
+# Kernel arguments baked into the image (bootc reads /usr/lib/bootc/kargs.d).
+# Serial first, tty0 last: tty0 becomes /dev/console (what the user sees),
+# while the serial port is captured to output/vm-serial.log by `just vm`.
+kargs = ["console=ttyS0,115200", "console=tty0"]

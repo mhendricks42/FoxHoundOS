@@ -92,7 +92,16 @@ Justfile rules (so recipes run identically under PowerShell and sh):
 
 Compose decisions:
 - `dev`, `builder` and `vm` share one image, `localhost/foxhoundos-dev:local`, built from `.devcontainer/Containerfile` (pinned to `fedora:44`). `builder` and `vm` sit behind the `build` and `vm` profiles. `pull_policy: never` makes compose build it when missing instead of trying to pull from a registry named `localhost`.
-- `/dev/kvm` is never listed under `devices:`, because compose fails hard when it is missing. The vm script detects it at runtime and falls back to TCG.
+- `/dev/kvm` is never listed under `devices:`, because compose fails hard when it is missing. Instead the `vm` service has `device_cgroup_rules: ["c 10:232 rwm"]` (KVM's fixed char device); `tools/vm.sh` creates the node, tries to open it, and falls back to TCG with a warning.
+- `just image`, `just vm` pass `--build` so a changed `.devcontainer/` is picked up automatically; `just dev`/`just lint` stay fast and rely on `just rebuild`.
+- Podman inside the `builder` container uses `cgroup_manager = "cgroupfs"` and file events (`.devcontainer/containers.conf`), and `--network=host` for builds and for bootc-image-builder.
+
+M1 build decisions:
+- Base `quay.io/fedora/fedora-bootc:44`; bootc-image-builder `quay.io/centos-bootc/bootc-image-builder:latest`. Both to be pinned by digest once a build works.
+- bootc-image-builder flags: `--type qcow2 --rootfs ext4 --use-librepo=True --progress verbose` (Fedora images have no default rootfs). Output: `output/qcow2/disk.qcow2`.
+- `image/config.toml` holds a **test-only** user `foxhound`/`foxhound` in `wheel`.
+- Kernel args live in `image/kargs.d/` → `/usr/lib/bootc/kargs.d/`: `console=ttyS0,115200 console=tty0` so `just vm` captures a serial log in `output/vm-serial.log`.
+- `just vm` boots a throwaway qcow2 overlay (backing file = the built disk) in `/var/tmp` inside the container, so the Windows bind mount is only read and every boot is fresh.
 
 ## 5. Milestones
 

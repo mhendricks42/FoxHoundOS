@@ -1,0 +1,18 @@
+# FoxHoundOS OS image. Built by `just image` into localhost/foxhoundos:dev
+# (podman, inside the privileged builder container). Build context: repo root.
+#
+# Pinned to the Fedora release; pin by digest once a build is known good.
+FROM quay.io/fedora/fedora-bootc:44
+
+# M1: session components are installed but not wired up yet. greetd is not
+# enabled until M2, so the system boots to a normal getty login on tty1.
+RUN dnf -y install \
+        greetd \
+        tuigreet \
+        cage \
+        cool-retro-term \
+    && dnf clean all
+
+COPY image/kargs.d/ /usr/lib/bootc/kargs.d/
+
+RUN bootc container lint

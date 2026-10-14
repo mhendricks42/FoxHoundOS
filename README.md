@@ -23,17 +23,37 @@ just dev     # shell inside the dev container, repo mounted at /workspace
 
 `just` with no arguments lists every command.
 
-### Available now (M0)
+### Available now (M1)
 
 | Command | What it does |
 |---|---|
 | `just dev` | Shell in the dev container (shellcheck, python, fonttools, podman, qemu) |
 | `just lint` | shellcheck, TOML/JSON/YAML syntax, CRLF check, justfile parse |
-| `just rebuild` | Rebuild the dev image after changing `.devcontainer/` |
+| `just image` | Build the OS image `localhost/foxhoundos:dev` |
+| `just qcow` | Build the image, then a VM disk at `output/qcow2/disk.qcow2` |
+| `just vm` | Boot that disk; watch it at <http://localhost:6080/vnc.html?autoconnect=1&resize=scale> |
+| `just rebuild` | Rebuild the dev image (image/qcow/vm do this automatically) |
 | `just clean` | Delete `output/` contents and stopped containers |
 
-`just image`, `just qcow`, `just vm`, `just iso`, `just branding` and
-`just preview` exist but report "not implemented yet" until their milestone.
+`just iso`, `just branding` and `just preview` report "not implemented yet"
+until their milestone.
+
+### Boot a VM
+
+```powershell
+just qcow   # first run downloads ~2-3 GB and takes 10-20 minutes
+just vm     # then open the noVNC link it prints
+```
+
+Log in as **foxhound / foxhound** (a test-only account from
+`image/config.toml`; never ship an image built with it). Press Ctrl+C in the
+terminal running `just vm` to stop the VM. Each boot starts from the built
+disk, so changes made inside the VM are thrown away. The VM's serial console
+is written to `output/vm-serial.log`.
+
+Build state (base images, our image) lives in the Docker volume
+`foxhoundos_builder-storage`, so rebuilds are incremental. To reclaim the
+space: `docker volume rm foxhoundos_builder-storage`.
 
 ### VS Code
 
@@ -47,7 +67,7 @@ docker run --rm --device /dev/kvm alpine ls -l /dev/kvm
 ```
 
 A `crw-rw----` line means VMs will use KVM. An error means they will fall back
-to slow software emulation. To fix it, make sure virtualization is enabled in
+to slow software emulation (`just vm` prints a warning). To fix it, make sure virtualization is enabled in
 your BIOS and `%UserProfile%\.wslconfig` doesn't set `nestedVirtualization=false`,
 then run `wsl --shutdown` and restart Docker Desktop.
 

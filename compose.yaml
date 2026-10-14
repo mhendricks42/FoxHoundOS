@@ -36,13 +36,16 @@ services:
       # bind mount (overlay does not work there and it is slow).
       - builder-storage:/var/lib/containers/storage
 
-  # Boots output/*.qcow2 in QEMU+OVMF, display via noVNC (M1+).
+  # Boots output/qcow2/disk.qcow2 in QEMU+OVMF, display via noVNC.
   # /dev/kvm is NOT listed under `devices:` on purpose: compose fails hard if
-  # it is missing. The M1 vm script detects it and falls back to TCG.
+  # it is missing. Instead the cgroup rule allows the KVM char device (10:232)
+  # and tools/vm.sh creates the node, probes it, and falls back to TCG.
   vm:
     <<: *dev-image
     profiles: [vm]
     working_dir: /workspace
+    device_cgroup_rules:
+      - "c 10:232 rwm"
     volumes:
       - .:/workspace
     ports:

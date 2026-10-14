@@ -19,7 +19,7 @@ dev:
 lint:
     docker compose run --rm -T dev bash tools/lint.sh
 
-# Rebuild the dev container image (after editing .devcontainer/)
+# Rebuild the dev container image (image/qcow/vm do this automatically)
 rebuild:
     docker compose build dev
 
@@ -27,21 +27,21 @@ rebuild:
 branding:
     @echo "just branding: not implemented yet (milestone M3)"; exit 1
 
-# Build the bootc OS image localhost/foxhoundos:dev (M1)
+# Build the bootc OS image localhost/foxhoundos:dev
 image:
-    @echo "just image: not implemented yet (milestone M1)"; exit 1
+    docker compose run --rm -T --build builder bash tools/build-image.sh
 
 # Build an installer ISO into output/ (M7)
 iso:
     @echo "just iso: not implemented yet (milestone M7)"; exit 1
 
-# Build a qcow2 VM disk into output/ (M1)
-qcow:
-    @echo "just qcow: not implemented yet (milestone M1)"; exit 1
+# Build the image, then a qcow2 VM disk into output/qcow2/
+qcow: image
+    docker compose run --rm -T builder bash tools/build-qcow.sh
 
-# Boot the qcow2 in QEMU, watch at http://localhost:6080 (M1)
+# Boot the qcow2 in QEMU, watch at http://localhost:6080
 vm:
-    @echo "just vm: not implemented yet (milestone M1)"; exit 1
+    docker compose run --rm --build --service-ports vm bash tools/vm.sh
 
 # Serve the boot-flow simulator at http://localhost:8080
 preview:

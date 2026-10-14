@@ -33,3 +33,24 @@
 ## Rename to FoxHoundOS (2026-10-14)
 
 Product renamed from NeonOS to FoxHoundOS everywhere: image tags (`localhost/foxhoundos:dev`, `localhost/foxhoundos-dev:local`), compose project `foxhoundos`, Plymouth theme `foxhound`, `session/foxhound-session`, `image/kargs.d/10-foxhound.toml`.
+
+## M1: Bootable base (2026-10-14), written, not yet verified
+
+**Done**
+- `image/Containerfile`: `fedora-bootc:44` plus greetd, tuigreet, cage, cool-retro-term; `bootc container lint`. greetd installed but not enabled (M2).
+- `image/kargs.d/10-foxhound.toml`: serial + tty0 console. `image/config.toml`: test user `foxhound`/`foxhound`.
+- `tools/build-image.sh` (`just image`): podman build in the privileged builder.
+- `tools/build-qcow.sh` (`just qcow`): bootc-image-builder → `output/qcow2/disk.qcow2`.
+- `tools/vm.sh` (`just vm`): QEMU q35 + OVMF + virtio-vga, throwaway overlay, noVNC on 6080, serial log in `output/vm-serial.log`, KVM probe with TCG fallback.
+- Dev image gained novnc, websockify and a podman config for running inside Docker.
+
+**Verified here (Linux sandbox)**
+- Lint and `docker compose config` pass.
+- KVM probe fallback: in a compose container with the same cgroup rule and no host KVM, the probe picks TCG and prints the warning.
+
+**Not verified**
+- Nothing was built or booted: this sandbox can't reach quay.io or the Fedora mirrors. The bootc-image-builder flags come from upstream docs snippets and memory; the current upstream README moved and could not be fetched.
+- Fedora 44 package names: greetd, tuigreet (0.9.1-7.fc44) and cool-retro-term are confirmed on packages.fedoraproject.org; `cage` is not confirmed.
+- Podman-in-Docker and bootc-image-builder nested in it are untested on Docker Desktop.
+
+**Acceptance check (to run on Windows):** `just qcow`, `just vm`, open noVNC, log in as foxhound at the TTY.

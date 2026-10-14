@@ -1,0 +1,8 @@
+# bootc-image-builder config for `just qcow` / `just iso`.
+#
+# DEV/TEST ONLY: a known login for VMs. The password is public on purpose;
+# do not ship images built with this file.
+[[customizations.user]]
+name = "foxhound"
+password = "foxhound"
+groups = ["wheel"]
