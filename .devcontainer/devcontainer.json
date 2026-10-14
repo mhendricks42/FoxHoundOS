@@ -1,0 +1,17 @@
+{
+  "name": "NeonOS dev",
+  "dockerComposeFile": "../compose.yaml",
+  "service": "dev",
+  "workspaceFolder": "/workspace",
+  "overrideCommand": true,
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "timonwong.shellcheck",
+        "tamasfe.even-better-toml",
+        "nefrob.vscode-just-syntax",
+        "editorconfig.editorconfig"
+      ]
+    }
+  }
+}

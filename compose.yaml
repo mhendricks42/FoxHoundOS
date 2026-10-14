@@ -1,0 +1,49 @@
+# All NeonOS tooling runs in these services. Entry points live in the justfile.
+name: neonos
+
+x-dev-image: &dev-image
+  build:
+    context: .devcontainer
+    dockerfile: Containerfile
+  image: localhost/neonos-dev:local
+
+services:
+  # Unprivileged shell for linting, branding generation and editing.
+  dev:
+    <<: *dev-image
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+    ports:
+      - "8080:8080" # just preview (M3+)
+
+  # Builds the bootc image, ISO and qcow2 (M1+).
+  # Privileged because podman-in-docker and bootc-image-builder need to mount
+  # filesystems, create loop devices and set up overlay storage. This only
+  # grants rights inside Docker Desktop's VM; the Windows host root is never
+  # mounted, only the repo.
+  builder:
+    <<: *dev-image
+    profiles: [build]
+    privileged: true
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+      # Container storage must be on a Linux filesystem, never the Windows
+      # bind mount (overlay does not work there and it is slow).
+      - builder-storage:/var/lib/containers/storage
+
+  # Boots output/*.qcow2 in QEMU+OVMF, display via noVNC (M1+).
+  # /dev/kvm is NOT listed under `devices:` on purpose: compose fails hard if
+  # it is missing. The M1 vm script detects it and falls back to TCG.
+  vm:
+    <<: *dev-image
+    profiles: [vm]
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+    ports:
+      - "6080:6080" # noVNC
+
+volumes:
+  builder-storage:

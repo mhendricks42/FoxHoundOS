@@ -1,0 +1,29 @@
+# Everything that runs does so on Linux: LF everywhere, regardless of core.autocrlf.
+* text=auto eol=lf
+
+# Extensionless files that are always text (scripts, units, session wrappers).
+justfile            text eol=lf
+session/neon-session text eol=lf
+tools/gen-branding  text eol=lf
+
+# Binaries: never touch.
+*.png   binary
+*.jpg   binary
+*.ico   binary
+*.pf2   binary
+*.psf   binary
+*.psfu  binary
+*.psf.gz binary
+*.ttf   binary
+*.otf   binary
+*.woff  binary
+*.woff2 binary
+*.wav   binary
+*.iso   binary
+*.qcow2 binary
+*.raw   binary
+*.img   binary
+*.rpm   binary
+*.gz    binary
+*.xz    binary
+*.zst   binary
