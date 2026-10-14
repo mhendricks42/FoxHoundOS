@@ -4,8 +4,12 @@
 set -euo pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
+# shellcheck source=tools/lib/cgroups.sh
+source tools/lib/cgroups.sh
 
 IMAGE=localhost/foxhoundos:dev
+
+delegate_cgroups
 
 echo "==> Building ${IMAGE} from image/Containerfile"
 # Host networking: no netavark/iptables setup needed inside Docker.

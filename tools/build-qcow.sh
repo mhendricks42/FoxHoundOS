@@ -6,6 +6,8 @@
 set -euo pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
+# shellcheck source=tools/lib/cgroups.sh
+source tools/lib/cgroups.sh
 
 IMAGE=localhost/foxhoundos:dev
 # Pin by digest once a build is known good.
@@ -37,6 +39,8 @@ Fedora, Ubuntu, Debian and Arch).
 MSG
   exit 1
 fi
+
+delegate_cgroups
 
 mkdir -p output
 echo "==> Building output/qcow2/disk.qcow2 (this takes several minutes)"

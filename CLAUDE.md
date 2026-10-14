@@ -95,6 +95,7 @@ Compose decisions:
 - `dev`, `builder` and `vm` share one image, `localhost/foxhoundos-dev:local`, built from `.devcontainer/Containerfile` (pinned to `fedora:44`). `builder` and `vm` sit behind the `build` and `vm` profiles. `pull_policy: never` makes compose build it when missing instead of trying to pull from a registry named `localhost`.
 - `/dev/kvm` is never listed under `devices:`, because compose fails hard when it is missing. Instead the `vm` service has `device_cgroup_rules: ["c 10:232 rwm"]` (KVM's fixed char device); `tools/vm.sh` creates the node, tries to open it, and falls back to TCG with a warning.
 - `just image`, `just vm` pass `--build` so a changed `.devcontainer/` is picked up automatically; `just dev`/`just lint` stay fast and rely on `just rebuild`.
+- Before running podman, builder scripts call `delegate_cgroups` (`tools/lib/cgroups.sh`): on cgroups v2 it moves the container's processes into a leaf cgroup and enables all controllers for children, as Docker's dind entrypoint does. Without it podman's containers fail with "controller `pids` is not available".
 - Podman inside the `builder` container uses `cgroup_manager = "cgroupfs"` and file events (`.devcontainer/containers.conf`), and `--network=host` for builds and for bootc-image-builder.
 
 M1 build decisions:
