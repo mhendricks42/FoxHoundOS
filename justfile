@@ -1,4 +1,4 @@
-# NeonOS entry points. Every recipe wraps `docker compose`, so it behaves the
+# FoxHoundOS entry points. Every recipe wraps `docker compose`, so it behaves the
 # same from PowerShell, WSL, or the Linux test machine.
 #
 # Recipes are single-line commands understood by both PowerShell and sh:
@@ -27,7 +27,7 @@ rebuild:
 branding:
     @echo "just branding: not implemented yet (milestone M3)"; exit 1
 
-# Build the bootc OS image localhost/neonos:dev (M1)
+# Build the bootc OS image localhost/foxhoundos:dev (M1)
 image:
     @echo "just image: not implemented yet (milestone M1)"; exit 1
 

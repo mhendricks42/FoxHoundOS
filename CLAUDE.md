@@ -1,10 +1,8 @@
-# NeonOS: project guide for Claude Code
+# FoxHoundOS: project guide for Claude Code
 
-NeonOS is a Linux distribution where the entire experience, from boot to shell, looks like an old CRT terminal. Firmware, bootloader, kernel console, boot splash, login and session all share one phosphor palette, one font and one visual language. The session itself is `cool-retro-term`, running fullscreen with no desktop environment.
+FoxHoundOS is a Linux distribution where the entire experience, from boot to shell, looks like an old CRT terminal. Firmware, bootloader, kernel console, boot splash, login and session all share one phosphor palette, one font and one visual language. The session itself is `cool-retro-term`, running fullscreen with no desktop environment.
 
 Read this file before every task. When a decision here turns out to be wrong, update this file in the same change.
-
-The Git repository is named **FoxHoundOS**; the product, image tags and theme names are still **NeonOS** / `neonos` until a rename is decided.
 
 ---
 
@@ -33,11 +31,11 @@ Fallback, if bootc blocks a core requirement (see risks): Arch + `archiso`. Do n
 | Firmware POST | Not ours | Fast boot plus hidden logo on real hardware. In QEMU, an optional custom OVMF logo. The "BIOS" the user sees is faked by `post.sh`. |
 | Bootloader (GRUB) | `branding/grub/` | Phosphor theme: scanline background PNG, PF2 font, amber palette. **Risk:** bootc manages GRUB via bootupd, so investigate how far theming is supported. |
 | Kernel console | kernel args + `branding/console/` | `quiet loglevel=3`, `vt.default_red/grn/blu` palette, PSF font via `vconsole.conf`. |
-| Boot splash | `branding/plymouth/neon/` | Plymouth script theme: ASCII logo, block progress bar, status lines, password prompt for disk encryption, shutdown screen. It must be in the initramfs, so regenerate it with dracut in the Containerfile. |
+| Boot splash | `branding/plymouth/foxhound/` | Plymouth script theme: ASCII logo, block progress bar, status lines, password prompt for disk encryption, shutdown screen. It must be in the initramfs, so regenerate it with dracut in the Containerfile. |
 | Fake POST | `session/post.sh` | Runs *inside* cool-retro-term, so it gets real CRT effects. Shows a banner, memory count and drive detection, then `exec`s the greeter. |
 | Login | `session/greetd/` | greetd → `cage -s -- cool-retro-term --fullscreen -e post.sh` → tuigreet. |
 | Session | `session/` | After login: `cage -s -- cool-retro-term --fullscreen` running the user's shell, with tmux available. Ctrl+Alt+F2 must still give a plain TTY for recovery. |
-| Look and feel | `packages/cool-retro-term/` | Fork or patch it so the NeonOS profile is the built-in default. First find out where it stores settings and profiles, and prefer patching defaults over copying user config files. |
+| Look and feel | `packages/cool-retro-term/` | Fork or patch it so the FoxHoundOS profile is the built-in default. First find out where it stores settings and profiles, and prefer patching defaults over copying user config files. |
 
 ### Single source of truth for the look
 
@@ -46,7 +44,7 @@ Fallback, if bootc blocks a core requirement (see risks): Arch + `archiso`. Do n
 ## 3. Repository layout (target)
 
 ```
-neonos/
+FoxHoundOS/
 ├── CLAUDE.md
 ├── README.md                  # human quickstart: Windows + Docker Desktop
 ├── .gitattributes             # LF everywhere
@@ -55,13 +53,13 @@ neonos/
 ├── justfile                   # all entry points; see section 4
 ├── image/
 │   ├── Containerfile          # FROM fedora-bootc, installs packages, copies overlays
-│   ├── kargs.d/10-neon.toml   # kernel args
+│   ├── kargs.d/10-foxhound.toml  # kernel args
 │   └── config.toml            # bootc-image-builder config (user, disk layout)
 ├── branding/
 │   ├── palette.toml
-│   ├── grub/  plymouth/neon/  console/  fonts/
+│   ├── grub/  plymouth/foxhound/  console/  fonts/
 ├── session/
-│   ├── post.sh  greetd/config.toml  neon-session  tmux.conf
+│   ├── post.sh  greetd/config.toml  foxhound-session  tmux.conf
 ├── packages/
 │   └── cool-retro-term/       # RPM spec + patches for the default profile
 ├── tools/
@@ -78,7 +76,7 @@ Expose everything through `just`. Each recipe wraps `docker compose run ...` so 
 - `just dev`: open a shell in the dev container.
 - `just lint`: shellcheck, TOML/JSON validation, CRLF check, and `plymouth` script syntax check where possible.
 - `just branding`: regenerate derived assets from `palette.toml`.
-- `just image`: build the bootc OS image (`localhost/neonos:dev`) inside the builder container.
+- `just image`: build the bootc OS image (`localhost/foxhoundos:dev`) inside the builder container.
 - `just iso`: build an installer ISO into `output/`.
 - `just qcow`: build a VM disk into `output/`.
 - `just vm`: boot the qcow2 in QEMU with OVMF. The display is VNC, bridged to **noVNC at http://localhost:6080**, so it can be watched from a browser on Windows. Use `/dev/kvm` when it's available (WSL2 nested virtualization) and fall back to TCG with a warning.
@@ -93,7 +91,7 @@ Justfile rules (so recipes run identically under PowerShell and sh):
 - Use `-T` for non-interactive recipes so they also work without a TTY (CI).
 
 Compose decisions:
-- `dev`, `builder` and `vm` share one image, `localhost/neonos-dev:local`, built from `.devcontainer/Containerfile` (pinned to `fedora:44`). `builder` and `vm` sit behind the `build` and `vm` profiles.
+- `dev`, `builder` and `vm` share one image, `localhost/foxhoundos-dev:local`, built from `.devcontainer/Containerfile` (pinned to `fedora:44`). `builder` and `vm` sit behind the `build` and `vm` profiles.
 - `/dev/kvm` is never listed under `devices:`, because compose fails hard when it is missing. The vm script detects it at runtime and falls back to TCG.
 
 ## 5. Milestones
@@ -115,13 +113,13 @@ Work through them in order. Each milestone ends with its acceptance check passin
 **M4: Fake POST.** `post.sh` runs a typed BIOS banner, memory counter and drive detection, plus a beep if audio is available, then `exec tuigreet`. It must be skippable with any key and must not slow login by more than about 3 s.
 *Check:* the POST appears with CRT effects on every boot.
 
-**M5: Plymouth.** The `neon` script theme (logo, block progress bar, status text, LUKS password prompt, shutdown screen) is in the initramfs.
+**M5: Plymouth.** The `foxhound` script theme (logo, block progress bar, status text, LUKS password prompt, shutdown screen) is in the initramfs.
 *Check:* the splash appears in the VM on boot and shutdown; `plymouthd --debug` logs show no errors.
 
 **M6: GRUB.** Theme the boot menu. If bootc/bootupd prevents a full theme, document what is possible, implement the best available option, and record the decision here.
 *Check:* the boot menu matches the palette in the VM.
 
-**M7: Installer ISO.** `just iso` produces an Anaconda ISO that installs NeonOS; `tools/test-on-linux.sh` boots it on the Linux test machine with KVM.
+**M7: Installer ISO.** `just iso` produces an Anaconda ISO that installs FoxHoundOS; `tools/test-on-linux.sh` boots it on the Linux test machine with KVM.
 *Check:* a fresh install on the Linux machine boots straight into the CRT experience.
 
 **Later:** an OVMF custom logo for VMs, Calamares or a TUI installer themed to match, CI that builds the image and ISO on every push (GitHub Actions), signed images, and a matching shutdown/reboot experience.

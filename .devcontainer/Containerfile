@@ -1,4 +1,4 @@
-# NeonOS dev container: linting, branding generation, podman, QEMU.
+# FoxHoundOS dev container: linting, branding generation, podman, QEMU.
 # Pinned to a Fedora release so it matches the fedora-bootc base used in M1.
 FROM docker.io/library/fedora:44
 

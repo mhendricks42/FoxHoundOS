@@ -1,4 +1,4 @@
-# NeonOS
+# FoxHoundOS
 
 A Linux distribution that looks like an old CRT terminal from firmware to
 shell. See [CLAUDE.md](CLAUDE.md) for the design and [docs/progress.md](docs/progress.md)

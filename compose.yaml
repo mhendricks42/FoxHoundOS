@@ -1,11 +1,11 @@
-# All NeonOS tooling runs in these services. Entry points live in the justfile.
-name: neonos
+# All FoxHoundOS tooling runs in these services. Entry points live in the justfile.
+name: foxhoundos
 
 x-dev-image: &dev-image
   build:
     context: .devcontainer
     dockerfile: Containerfile
-  image: localhost/neonos-dev:local
+  image: localhost/foxhoundos-dev:local
 
 services:
   # Unprivileged shell for linting, branding generation and editing.

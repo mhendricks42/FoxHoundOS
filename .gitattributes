@@ -3,7 +3,7 @@
 
 # Extensionless files that are always text (scripts, units, session wrappers).
 justfile            text eol=lf
-session/neon-session text eol=lf
+session/foxhound-session text eol=lf
 tools/gen-branding  text eol=lf
 
 # Binaries: never touch.

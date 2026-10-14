@@ -1,5 +1,5 @@
 {
-  "name": "NeonOS dev",
+  "name": "FoxHoundOS dev",
   "dockerComposeFile": "../compose.yaml",
   "service": "dev",
   "workspaceFolder": "/workspace",

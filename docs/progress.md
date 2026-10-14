@@ -21,5 +21,6 @@
 - Nothing has been run from PowerShell on Windows. The `windows-shell` behavior and the stub recipes (`echo ...; exit 1`) still need checking there.
 - To close M0, on a clean Windows box: install Git + Docker Desktop + just, then `just lint` (expect "lint: all checks passed") and `just dev` (expect a bash prompt in `/workspace`).
 
-**Open questions**
-- Product name: the repo is FoxHoundOS, but the guide says NeonOS. Kept NeonOS for now.
+## Rename to FoxHoundOS (2026-10-14)
+
+Product renamed from NeonOS to FoxHoundOS everywhere: image tags (`localhost/foxhoundos:dev`, `localhost/foxhoundos-dev:local`), compose project `foxhoundos`, Plymouth theme `foxhound`, `session/foxhound-session`, `image/kargs.d/10-foxhound.toml`.
