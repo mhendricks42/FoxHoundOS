@@ -10,6 +10,7 @@ Read this file before every task. When a decision here turns out to be wrong, up
 
 - **Development host is Windows** (Windows 11, Docker Desktop with the WSL2 backend). Most work happens through Claude Code on Windows.
 - **Everything builds and runs in containers.** The only host requirements are Git, Docker Desktop, `just` (`winget install Casey.Just`; a single native binary) and a text editor. Never require installing Linux tools on the host or inside the user's WSL distro.
+- **cgroups v2 required for VM builds:** bootc-image-builder's internal podman refuses cgroups v1, and Docker Desktop's WSL2 VM can still be on v1. The README's one-time host setting is `kernelCommandLine = cgroup_no_v1=all` under `[wsl2]` in `%UserProfile%\.wslconfig`. `tools/build-qcow.sh` checks for this and prints the fix.
 - **Exec bits:** a Windows checkout loses Unix exec bits. Always invoke scripts as `bash path/to/script`, never `./script`.
 - **Container storage** (podman, bootc-image-builder) lives in named Docker volumes, never in the Windows bind mount: overlayfs does not work there and it is slow.
 - **Real-hardware testing happens on a separate Linux machine.** Produce artifacts (ISO, disk images) that can be copied there, plus a script that runs the same QEMU test on that machine.

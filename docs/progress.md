@@ -54,3 +54,8 @@ Product renamed from NeonOS to FoxHoundOS everywhere: image tags (`localhost/fox
 - Podman-in-Docker and bootc-image-builder nested in it are untested on Docker Desktop.
 
 **Acceptance check (to run on Windows):** `just qcow`, `just vm`, open noVNC, log in as foxhound at the TTY.
+
+### M1 first Windows run (2026-10-14)
+- `just image` worked: podman inside the builder pulled fedora-bootc:44, installed all four packages (so `cage` exists in Fedora 44) and passed `bootc container lint`.
+- `just qcow` failed: bootc-image-builder's internal podman reported `Cgroups v1 not supported`. Docker Desktop's WSL2 VM was on cgroups v1.
+- Fix: the one-time `.wslconfig` setting `kernelCommandLine = cgroup_no_v1=all` (README). `tools/build-qcow.sh` now checks the cgroup version up front and prints these steps.

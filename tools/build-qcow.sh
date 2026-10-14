@@ -16,6 +16,28 @@ if ! podman image exists "${IMAGE}"; then
   exit 1
 fi
 
+# bootc-image-builder runs a recent podman internally, which refuses to work
+# on cgroups v1. Docker Desktop's WSL2 VM can still be on v1; fail early with
+# the fix instead of bib's misleading "make sure to pull" message.
+if [[ "$(stat -fc %T /sys/fs/cgroup)" != "cgroup2fs" ]]; then
+  cat >&2 <<'MSG'
+error: Docker is running with cgroups v1; bootc-image-builder needs cgroups v2.
+
+On Windows (Docker Desktop + WSL2), in PowerShell:
+  1. wsl --update
+  2. Add these lines to %UserProfile%\.wslconfig (create the file if needed;
+     if it already has a [wsl2] section, add only the second line under it):
+       [wsl2]
+       kernelCommandLine = cgroup_no_v1=all
+  3. wsl --shutdown, then restart Docker Desktop.
+  4. Check: docker info --format "{{.CgroupVersion}}"   (should print 2)
+
+On Linux, use a distro that boots with cgroups v2 (the default on current
+Fedora, Ubuntu, Debian and Arch).
+MSG
+  exit 1
+fi
+
 mkdir -p output
 echo "==> Building output/qcow2/disk.qcow2 (this takes several minutes)"
 # Fedora images have no default root filesystem, hence --rootfs.

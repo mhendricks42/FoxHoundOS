@@ -14,6 +14,26 @@ You need exactly three things on the host:
 
 Nothing else: no WSL distro setup, no Linux tools on Windows.
 
+**One-time setting for VM builds (`just qcow`):** the build tools need cgroups
+v2, which Docker Desktop's WSL2 VM may not use by default. In PowerShell:
+
+```powershell
+wsl --update
+notepad $env:USERPROFILE\.wslconfig
+```
+
+Add these lines and save. If the file already has a `[wsl2]` section, add only
+the second line under it:
+
+```ini
+[wsl2]
+kernelCommandLine = cgroup_no_v1=all
+```
+
+Then run `wsl --shutdown`, restart Docker Desktop, and check that
+`docker info --format "{{.CgroupVersion}}"` prints `2`. This setting applies
+to all your WSL distros; current distros and Docker handle cgroups v2 fine.
+
 ```powershell
 git clone <this repo> FoxHoundOS
 cd FoxHoundOS
@@ -72,6 +92,9 @@ your BIOS and `%UserProfile%\.wslconfig` doesn't set `nestedVirtualization=false
 then run `wsl --shutdown` and restart Docker Desktop.
 
 ## Troubleshooting
+
+- **`just qcow` says "Docker is running with cgroups v1"**: apply the
+  one-time `.wslconfig` setting above.
 
 - **`just` is not recognized**: open a new terminal after `winget install`.
 - **Script fails with `$'\r': command not found`**: a file got CRLF line
