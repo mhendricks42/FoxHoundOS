@@ -1,6 +1,6 @@
 # Progress
 
-## M0: Scaffold (2026-10-14)
+## M0: Scaffold (2026-10-14), done
 
 **Done**
 - Repo layout from CLAUDE.md §3 (empty dirs hold `.gitkeep`).
@@ -19,7 +19,11 @@
 **Windows results (2026-10-14)**
 - `just lint` from PowerShell: dev image built in ~35 s, "lint: all checks passed".
 - Compose printed a harmless `Get "http://localhost/v2/"` warning because it tried to pull the `localhost/...` image before building it. Fixed with `pull_policy: never` (tested: builds when the image is missing, no pull attempt, quiet afterwards).
-- Still pending: `just dev`, and the `/dev/kvm` check.
+- After `git pull`: `just lint` passes with no warning.
+- `just dev` from PowerShell: bash prompt in `/workspace`, exits cleanly.
+- KVM: `docker run --rm --device /dev/kvm alpine ls -l /dev/kvm` shows `crw-rw---- root 993 10,232`, so Docker Desktop containers can use KVM on this host. M1's `just vm` will use it, with a TCG fallback kept for other machines.
+
+**M0 status: DONE.** Acceptance check passed on Windows 11 + Docker Desktop.
 
 **Earlier sandbox notes**
 - The dev image was not built: the sandbox's network policy blocks the Fedora mirrors (`mirrors.fedoraproject.org`, `registry.fedoraproject.org`). So `just lint` / `just dev` haven't run end to end through the container.
