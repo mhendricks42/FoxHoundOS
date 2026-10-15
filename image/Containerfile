@@ -1,8 +1,9 @@
 # FoxHoundOS OS image. Built by `just image` into localhost/foxhoundos:dev
 # (podman, inside the privileged builder container). Build context: repo root.
 #
-# Pinned to the Fedora release; pin by digest once a build is known good.
-FROM quay.io/fedora/fedora-bootc:44
+# Pinned by digest (known good 2026-10-15). To update: bump the digest,
+# rebuild with `just qcow`, and boot-test with `just vm`.
+FROM quay.io/fedora/fedora-bootc:44@sha256:22a5e3fb9e5587189144ac0ef321e153662580bfb411022f55becdae9141f114
 
 # M1: session components are installed but not wired up yet. greetd is not
 # enabled until M2, so the system boots to a normal getty login on tty1.

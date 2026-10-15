@@ -10,8 +10,8 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.."
 source tools/lib/cgroups.sh
 
 IMAGE=localhost/foxhoundos:dev
-# Pin by digest once a build is known good.
-BIB_IMAGE=quay.io/centos-bootc/bootc-image-builder:latest
+# Pinned by digest (known good 2026-10-15); bump deliberately and re-test.
+BIB_IMAGE=quay.io/centos-bootc/bootc-image-builder:latest@sha256:9fd92cc2b582ba5aa9ed3b23c3b2b2521458e7f5e7aa4fc3494be5c88f4475b6
 
 if ! podman image exists "${IMAGE}"; then
   echo "error: ${IMAGE} not found; run 'just image' first" >&2
@@ -45,7 +45,7 @@ delegate_cgroups
 mkdir -p output
 echo "==> Building output/qcow2/disk.qcow2 (this takes several minutes)"
 # Fedora images have no default root filesystem, hence --rootfs.
-podman run --rm --privileged --pull=newer --network=host \
+podman run --rm --privileged --pull=missing --network=host \
   --security-opt label=type:unconfined_t \
   -v "${PWD}/image/config.toml:/config.toml:ro" \
   -v "${PWD}/output:/output" \

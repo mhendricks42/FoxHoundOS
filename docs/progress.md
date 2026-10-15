@@ -34,7 +34,7 @@
 
 Product renamed from NeonOS to FoxHoundOS everywhere: image tags (`localhost/foxhoundos:dev`, `localhost/foxhoundos-dev:local`), compose project `foxhoundos`, Plymouth theme `foxhound`, `session/foxhound-session`, `image/kargs.d/10-foxhound.toml`.
 
-## M1: Bootable base (2026-10-14), written, not yet verified
+## M1: Bootable base (2026-10-14), done
 
 **Done**
 - `image/Containerfile`: `fedora-bootc:44` plus greetd, tuigreet, cage, cool-retro-term; `bootc container lint`. greetd installed but not enabled (M2).
@@ -61,3 +61,10 @@ Product renamed from NeonOS to FoxHoundOS everywhere: image tags (`localhost/fox
 - Fix: the one-time `.wslconfig` setting `kernelCommandLine = cgroup_no_v1=all` (README). `tools/build-qcow.sh` now checks the cgroup version up front and prints these steps.
 - Second run, after the `.wslconfig` change: the cgroups v2 check passed and the image rebuilt from cache. bootc-image-builder then failed to start: `crun: controller pids is not available`. Cause: on cgroups v2, podman inside the builder can't delegate controllers while the builder's own processes sit in the root cgroup. Fix: `tools/lib/cgroups.sh` moves them to a leaf cgroup and enables controllers (the docker-in-docker approach). Not testable in the sandbox, which is on cgroups v1.
 - Third run: `just qcow` succeeded, so the cgroup delegation fix works and bootc-image-builder runs nested in Docker Desktop. `just vm` detected KVM, then QEMU rejected `-device virtio-vga`: Fedora packages it separately (`qemu-device-display-virtio-vga`), which `install_weak_deps=False` skipped. Added the package to the dev image, plus a fallback to `-vga std` in `tools/vm.sh` when the device is missing.
+- Fourth run: `just vm` booted with KVM. Logged in as foxhound at the tty1 prompt through noVNC.
+
+**M1 status: DONE.** Acceptance check passed on Windows 11 + Docker Desktop with KVM. TCG fallback is implemented but hasn't been boot-tested.
+
+Pinned from the working build:
+- `quay.io/fedora/fedora-bootc:44@sha256:22a5e3fb9e5587189144ac0ef321e153662580bfb411022f55becdae9141f114`
+- `quay.io/centos-bootc/bootc-image-builder:latest@sha256:9fd92cc2b582ba5aa9ed3b23c3b2b2521458e7f5e7aa4fc3494be5c88f4475b6`

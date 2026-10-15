@@ -99,7 +99,8 @@ Compose decisions:
 - Podman inside the `builder` container uses `cgroup_manager = "cgroupfs"` and file events (`.devcontainer/containers.conf`), and `--network=host` for builds and for bootc-image-builder.
 
 M1 build decisions:
-- Base `quay.io/fedora/fedora-bootc:44`; bootc-image-builder `quay.io/centos-bootc/bootc-image-builder:latest`. Both to be pinned by digest once a build works.
+- Base `quay.io/fedora/fedora-bootc:44` and bootc-image-builder `quay.io/centos-bootc/bootc-image-builder:latest` are pinned by digest (`image/Containerfile`, `tools/build-qcow.sh`) since M1 booted, and pulled with `--pull=missing`. Bump a digest deliberately, then rebuild and boot-test before committing.
+- Fedora splits QEMU devices into packages: the dev image needs `qemu-device-display-virtio-vga` for `-device virtio-vga` (weak deps are off).
 - bootc-image-builder flags: `--type qcow2 --rootfs ext4 --use-librepo=True --progress verbose` (Fedora images have no default rootfs). Output: `output/qcow2/disk.qcow2`.
 - `image/config.toml` holds a **test-only** user `foxhound`/`foxhound` in `wheel`.
 - Kernel args live in `image/kargs.d/` → `/usr/lib/bootc/kargs.d/`: `console=ttyS0,115200 console=tty0` so `just vm` captures a serial log in `output/vm-serial.log`.

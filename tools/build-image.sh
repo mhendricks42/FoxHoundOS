@@ -13,7 +13,7 @@ delegate_cgroups
 
 echo "==> Building ${IMAGE} from image/Containerfile"
 # Host networking: no netavark/iptables setup needed inside Docker.
-podman build --network=host --pull=newer -t "${IMAGE}" -f image/Containerfile .
+podman build --network=host --pull=missing -t "${IMAGE}" -f image/Containerfile .
 
 echo "==> Built ${IMAGE}"
 podman images --filter "reference=${IMAGE}"
