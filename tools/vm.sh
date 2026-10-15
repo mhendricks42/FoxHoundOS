@@ -60,6 +60,15 @@ fi
 fw_format=raw
 [[ "${ovmf_code}" == *.qcow2 ]] && fw_format=qcow2
 
+# --- Display -----------------------------------------------------------------
+# virtio-vga is a separate module on some distros (Fedora:
+# qemu-device-display-virtio-vga); fall back to the built-in std VGA.
+display_dev=(-device virtio-vga)
+if ! qemu-system-x86_64 -device help 2>/dev/null | grep -q '"virtio-vga"'; then
+  echo "WARNING: QEMU has no virtio-vga device; using standard VGA instead."
+  display_dev=(-vga std)
+fi
+
 # --- Throwaway state -------------------------------------------------------
 rm -rf "${RUN_DIR}"
 mkdir -p "${RUN_DIR}"
@@ -86,7 +95,7 @@ qemu-system-x86_64 \
   -drive "if=pflash,format=${fw_format},readonly=on,file=${ovmf_code}" \
   -drive "if=pflash,format=${fw_format},file=${RUN_DIR}/vars.${fw_format}" \
   -drive "if=virtio,format=qcow2,file=${RUN_DIR}/overlay.qcow2" \
-  -device virtio-vga \
+  "${display_dev[@]}" \
   -device qemu-xhci -device usb-tablet \
   -nic user,model=virtio-net-pci \
   -display vnc=127.0.0.1:0 \
